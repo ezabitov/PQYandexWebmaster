@@ -34,7 +34,7 @@ let
         //Генерим функцию
         getQueriesFn = (hostId as text) =>
         let
-            getQuerySource =  Web.Contents(url & userId & "/hosts/"& hostId & "/search-queries/popular/?order_by="&orderby"&query_indicator=TOTAL_SHOWS&query_indicator=TOTAL_CLICKS&query_indicator=AVG_SHOW_POSITION&query_indicator=AVG_CLICK_POSITION",
+            getQuerySource =  Web.Contents(url & userId & "/hosts/"& hostId & "/search-queries/popular/?order_by="&orderby&"&query_indicator=TOTAL_SHOWS&query_indicator=TOTAL_CLICKS&query_indicator=AVG_SHOW_POSITION&query_indicator=AVG_CLICK_POSITION",
             [Headers = [#"Authorization"=authKey]]),
             jsonListquery = Json.Document(getQuerySource,65001),
             listOfQueryToTable = Record.ToTable(jsonListquery),
