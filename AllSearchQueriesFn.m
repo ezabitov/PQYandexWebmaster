@@ -53,10 +53,10 @@ let
         deleteHostId = Table.RemoveColumns(expandToFinal,{"host_id"}),
             //Запускаем R-скрипт
             //Не забудьте поправить путь к файлу
-            R = R.Execute("require(gdata)#(lf)print(Sys.getlocale(category = ""LC_CTYPE""))#(lf)original_ctype <- Sys.getlocale(category = ""LC_CTYPE"")#(lf)Sys.setlocale(""LC_CTYPE"",""japanese"")#(lf)write.table(trim(dataset), file=""C:/path/queries.txt"", sep = ""\t"", row.names = FALSE, fileEncoding = ""UTF-8"", append=TRUE, col.names = FALSE)#(lf)plot(dataset);",[dataset=deleteHostId]),
-        changeType = Table.TransformColumnTypes(R,{{"TOTAL_SHOWS", Int64.Type}, {"TOTAL_CLICKS", Int64.Type}, {"AVG_SHOW_POSITION", type number}, {"AVG_CLICK_POSITION", type number}, {"Период", type text}, {"unicode_host_url", type text}, {"query_id", type text}, {"query_text", type text}}),
+            R = R.Execute("require(gdata)#(lf)print(Sys.getlocale(category = ""LC_CTYPE""))#(lf)original_ctype <- Sys.getlocale(category = ""LC_CTYPE"")#(lf)Sys.setlocale(""LC_CTYPE"",""japanese"")#(lf)write.table(trim(dataset), file=""C:/Users/margerko/Desktop/New folder/1111.txt"", sep = ""\t"", row.names = FALSE, fileEncoding = ""UTF-8"", append=TRUE, col.names = FALSE)#(lf)plot(dataset);",[dataset=deleteHostId]),
+        changeType = Table.TransformColumnTypes(deleteHostId,{{"TOTAL_SHOWS", Int64.Type}, {"TOTAL_CLICKS", Int64.Type}, {"AVG_SHOW_POSITION", type number}, {"AVG_CLICK_POSITION", type number}, {"Период", type text}, {"unicode_host_url", type text}, {"query_id", type text}, {"query_text", type text}})
 
     in
-        changeType
+        R
 in
     searchQueries
