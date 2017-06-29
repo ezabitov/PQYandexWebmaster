@@ -2,7 +2,11 @@
      Функция, при помощи которой мы забираем данные из API Яндекс.Вебмастер
      Свой токен можно узнать тут: https://oauth.yandex.ru/authorize?response_type=token&client_id=f08ac1790cc9409aa328b3eda091d105
 
-     Версия 1.0
+     Версия 1.1
+
+     Changelog:
+     1.1
+        Добавил проверку на подтвержденность прав Яндекс.Вебмастер
 
      Создатель: Эльдар Забитов (http://zabitov.ru)
 */
@@ -29,7 +33,10 @@ let
             jsonList = Json.Document(getSiteListSource,1251),
             hosts = jsonList[hosts],
             hostToTable = Table.FromList(hosts, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
-            tableExpose = Table.ExpandRecordColumn(hostToTable, "Column1", {"host_id", "unicode_host_url"}, {"host_id", "unicode_host_url"}),
+            tableExpose = Table.ExpandRecordColumn(hostToTable, "Column1", {"host_id", "unicode_host_url", "verified"}, {"host_id", "unicode_host_url", "verified"}),
+            filterVerified = Table.SelectRows(tableExpose, each ([verified] = true)),
+            deleteVerifiedColumn = Table.RemoveColumns(filterVerified,{"verified"}),
+
 
         //Генерим функцию
         getQueriesFn = (hostId as text) =>
@@ -48,7 +55,7 @@ let
             combineDates,
 
         //Используем функцию с host_id в виде аргумента
-        getAllHosts = Table.AddColumn(tableExpose, "Custom", each getQueriesFn([host_id])),
+        getAllHosts = Table.AddColumn(deleteVerifiedColumn, "Custom", each getQueriesFn([host_id])),
         expandToFinal = Table.ExpandTableColumn(getAllHosts, "Custom", {"query_id", "query_text", "TOTAL_SHOWS", "TOTAL_CLICKS", "AVG_SHOW_POSITION", "AVG_CLICK_POSITION", "Период"}, {"query_id", "query_text", "TOTAL_SHOWS", "TOTAL_CLICKS", "AVG_SHOW_POSITION", "AVG_CLICK_POSITION", "Период"}),
         deleteHostId = Table.RemoveColumns(expandToFinal,{"host_id"}),
             //Запускаем R-скрипт
