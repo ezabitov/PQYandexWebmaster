@@ -2,11 +2,12 @@
      Функция, при помощи которой мы забираем данные из API Яндекс.Вебмастер
      Свой токен можно узнать тут: https://oauth.yandex.ru/authorize?response_type=token&client_id=f08ac1790cc9409aa328b3eda091d105
 
-     Версия 1.2
+     Версия 1.21
 
      Changelog:
      1.1. Добавил проверку на подтвержденность прав Яндекс.Вебмастер
      1.2. Проверка на домены без данных с удалением ошибок
+     1.21. Чуть уменьшил код
      Создатель: Эльдар Забитов (http://zabitov.ru)
 */
 
@@ -43,10 +44,8 @@ let
             getQuerySource =  Web.Contents(url & userId & "/hosts/"& hostId & "/search-queries/popular/?order_by="&orderby&"&query_indicator=TOTAL_SHOWS&query_indicator=TOTAL_CLICKS&query_indicator=AVG_SHOW_POSITION&query_indicator=AVG_CLICK_POSITION",
             [Headers = [#"Authorization"=authKey]]),
             jsonListquery = Json.Document(getQuerySource,65001),
-            listOfQueryToTable = Record.ToTable(jsonListquery),
-            transpot = Table.Transpose(listOfQueryToTable),
-            promoteHeaders = Table.PromoteHeaders(transpot),
-            expandColumn = Table.ExpandListColumn(promoteHeaders, "queries"),
+            listOfQueryToTable = Table.FromRecords({jsonListquery}),
+            expandColumn = Table.ExpandListColumn(listOfQueryToTable, "queries"),
             expandColumn2 = Table.ExpandRecordColumn(expandColumn, "queries", {"query_id", "query_text", "indicators"}, {"query_id", "query_text", "indicators"}),
             expandColumn3 = Table.ExpandRecordColumn(expandColumn2, "indicators", {"TOTAL_SHOWS", "TOTAL_CLICKS", "AVG_SHOW_POSITION", "AVG_CLICK_POSITION"}, {"TOTAL_SHOWS", "TOTAL_CLICKS", "AVG_SHOW_POSITION", "AVG_CLICK_POSITION"}),
             combineDates = Table.CombineColumns(expandColumn3,{"date_from", "date_to"},Combiner.CombineTextByDelimiter(" — ", QuoteStyle.None),"Период")
